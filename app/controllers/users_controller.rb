@@ -1,8 +1,15 @@
 class UsersController < ApplicationController
 
     def index
-        @users = User.all
-        render json: @users
+        @users = User.page(params[:page]).per(10)
+        render json: {
+            users: @users,
+            current_page: @users.current_page,
+            total_pages: @users.total_pages,
+            next_page: @users.next_page,
+            prev_page: @users.prev_page,
+            total_count: @users.total_count
+        }
     end
 
     def create
@@ -19,8 +26,15 @@ class UsersController < ApplicationController
         conditions = campaign_names.map do |name|
             "JSON_UNQUOTE(JSON_EXTRACT(campaigns_list, '$[*].campaign_name')) LIKE '%#{name}%'"
         end.join(" OR ")
-        @users = User.where(conditions)
-        render json: @users
+        @users = User.where(conditions).page(params[:page]).per(10)
+        render json: {
+            users: @users,
+            current_page: @users.current_page,
+            total_pages: @users.total_pages,
+            next_page: @users.next_page,
+            prev_page: @users.prev_page,
+            total_count: @users.total_count
+        }
     end
 
     private
